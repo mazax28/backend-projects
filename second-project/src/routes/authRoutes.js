@@ -8,6 +8,9 @@ const router = express.Router();  // Crea un enrutador de Express
 router.post('/register', (req,res)=>{
     res.status(200).send('register')
 })
+router.post('/login',(req,res)=>{
+    res.status(200).send('login')
+})
 
 
 
