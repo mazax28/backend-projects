@@ -3,7 +3,7 @@ import express from 'express';  // Importa el paquete Express para crear el serv
 import path, { dirname } from 'path';  // Importa el módulo path para manejar rutas de archivos
 import { fileURLToPath } from 'url';  // Importa fileURLToPath para convertir la URL de la ruta de archivo
 import authRoutes from './routes/authRoutes.js';  // Importa el enrutador de autenticación
-
+import todoRoutes from './routes/todoRoutes.js';  // Importa el enrutador de todos
 // Inicializa la aplicación de Express
 const app = express();
 
@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/auth', authRoutes);
+app.use('/todos', todoRoutes);
 
 
 // Inicia el servidor en el puerto especificado
