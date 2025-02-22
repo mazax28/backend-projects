@@ -13,7 +13,10 @@ router.post('/register', (req, res) => {
     try {
         // Usa la función insertUser desde dbQueries.js
         const result = insertUser(username, hashedPassword);
-        
+        console.log('User created with ID:', result.lastInsertRowid); // Asegúrate de que tenga un valor válido
+        if (!result.lastInsertRowid) {
+            throw new Error('User creation failed');
+        }
         // Usa la función insertTodo para insertar la tarea por defecto
         const defaultTodo = "Hello :) Add your first todo here!";
         insertTodo(result.lastInsertRowid, defaultTodo);
