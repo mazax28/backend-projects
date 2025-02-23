@@ -1,27 +1,33 @@
 import express from 'express';  // Importa el paquete Express para crear el servidor
-import db from '../db/db.js';  // Importa la base de datos SQLite
-import { insertTodo } from '../db/dbQueries.js';
-
+import prisma from '../prismaClient';
 const router = express.Router();  // Crea un enrutador de Express
 
 // Lista todos los todos del usuario logueado
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     console.log(req.userId)
-    const getTodos = db.prepare('SELECT * FROM todos WHERE user_id = ?');
-    const todos = getTodos.all(req.userId);
-    res.json(todos);
+    const {userId} = req;
+    const todosUser = await prisma.todo.findMany({
+        where: {
+            user_id: parseInt(userId)
+        }
+    });
+    res.json(todosUser);
 
 })
 
 //Crea un nuevo todo 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const {task} = req.body;
     const {userId} = req;
 
     try{
-            const insertodo = db.prepare('INSERT INTO todos (user_id, task,completed) VALUES (?, ?, ?)');
-            const result = insertodo.run(userId
-            , task, 0);
+            const insertTodo = await prisma.todo.create({
+                data:{
+                    task,
+                    completed:false,
+                    user_id: parseInt(userId)
+                }
+            });
             res.status(201).json({id: result.lastInsertRowid, task, completed: 0});
     }
     catch(error){
@@ -31,12 +37,19 @@ router.post('/', (req, res) => {
         
 })
 
-router.put('/:id', (req, res) => {
-    const {completed} = req.body;
-    const {id} = req.params;
+router.put('/:id', async (req, res) => {
+    const {newCompleted} = req.body;
+    const {todoId} = req.params;
     try{
-        const updateTodo = db.prepare('UPDATE todos SET completed = ? WHERE id = ?');
-        const result = updateTodo.run(completed, id);
+        const updateTodo =  await prisma.todo.update({
+            where:{
+                id: parseInt(todoId)
+            },
+            data:{
+                completed: newCompleted
+            }
+            
+        });
         res.json({id, completed});
     }
     catch(error){
@@ -46,13 +59,16 @@ router.put('/:id', (req, res) => {
 }
 )
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const {completed} = req.body;
-    const {id} = req.params;
+    const {todoId} = req.params;
     console.log(id)
     try{
-        const deleteTodo = db.prepare('DELETE FROM todos WHERE id = ?');
-        const result = deleteTodo.run(id);
+        const deleteTodo = await prisma.todo.delete({
+            where:{
+                id: Number(todoId)
+            }
+        })
         res.json({id});
     }
     catch(error){
