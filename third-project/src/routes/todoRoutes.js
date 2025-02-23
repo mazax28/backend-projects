@@ -1,5 +1,5 @@
 import express from 'express';  // Importa el paquete Express para crear el servidor
-import prisma from '../prismaClient';
+import prisma from '../prismaClient.js';
 const router = express.Router();  // Crea un enrutador de Express
 
 // Lista todos los todos del usuario logueado
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
                     user_id: parseInt(userId)
                 }
             });
-            res.status(201).json({id: result.lastInsertRowid, task, completed: 0});
+            res.sendStatus(201);
     }
     catch(error){
         console.error('Error during todo creation:', error);
@@ -38,19 +38,19 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-    const {newCompleted} = req.body;
-    const {todoId} = req.params;
+    const {completed} = req.body;
+    const {id} = req.params;
     try{
         const updateTodo =  await prisma.todo.update({
             where:{
-                id: parseInt(todoId)
+                id: parseInt(id)
             },
             data:{
-                completed: newCompleted
+                completed: completed
             }
             
         });
-        res.json({id, completed});
+        res.json(updateTodo);
     }
     catch(error){
         console.error('Error during todo update:', error);
@@ -60,16 +60,15 @@ router.put('/:id', async (req, res) => {
 )
 
 router.delete('/:id', async (req, res) => {
-    const {completed} = req.body;
-    const {todoId} = req.params;
+    const {id} = req.params;
     console.log(id)
     try{
         const deleteTodo = await prisma.todo.delete({
             where:{
-                id: Number(todoId)
+                id: Number(id)
             }
         })
-        res.json({id});
+        res.json(deleteTodo);
     }
     catch(error){
         console.error('Error during todo update:', error);

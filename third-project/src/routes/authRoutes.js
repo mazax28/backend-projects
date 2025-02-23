@@ -2,7 +2,7 @@
 import express from 'express'; 
 import bcrypt from 'bcryptjs';  
 import jwt from 'jsonwebtoken';
-import prisma from '../prismaClient';  
+import prisma from '../prismaClient.js';  
 
 const router = express.Router();  
 
@@ -27,6 +27,7 @@ router.post('/register', async (req, res) => {
         const newTodo = await prisma.todo.create({
             data:{
                 task: defaultTodo,
+                completed: false,
                 user: {
                     connect: {
                         id: Number(newUser.id)
