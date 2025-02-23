@@ -56,4 +56,31 @@ async function updateUser(id, data){
     console.log(user)
 
 }
-main()
+
+async function createPost(userId){
+    
+    const post = await prisma.post.create({
+        data:{
+            title: "My first post",
+            content: "This is my first post",
+            author:{
+                connect:{
+                    id: userId
+                }
+            }
+        }
+    })
+    console.log(post)
+}
+
+async function ListUsersPosts(){
+    const users =  await prisma.user.findMany({
+        include:{
+            posts:true
+        }
+    })
+
+    console.log(users)
+}
+
+createPost(2)
