@@ -1,28 +1,42 @@
 // authRoutes.js
 import express from 'express'; 
 import bcrypt from 'bcryptjs';  
-import jwt from 'jsonwebtoken';  
-import { insertUser, insertTodo, getUser } from '../db/dbQueries.js';  // Importa las funciones de consultas
+import jwt from 'jsonwebtoken';
+import prisma from '../prismaClient';  
 
 const router = express.Router();  
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 8);
     
     try {
         // Usa la función insertUser desde dbQueries.js
-        const result = insertUser(username, hashedPassword);
-        console.log('User created with ID:', result.lastInsertRowid); // Asegúrate de que tenga un valor válido
-        if (!result.lastInsertRowid) {
+        const newUser = await prisma.user.create({
+            data:{
+                name: username,
+                password: hashedPassword
+            }
+        })
+        console.log('User created with ID:', newUser.id); // Asegúrate de que tenga un valor válido
+        if (!newUser || !newUser.id) {
             throw new Error('User creation failed');
         }
         // Usa la función insertTodo para insertar la tarea por defecto
         const defaultTodo = "Hello :) Add your first todo here!";
-        insertTodo(result.lastInsertRowid, defaultTodo);
+        const newTodo = await prisma.todo.create({
+            data:{
+                task: defaultTodo,
+                user: {
+                    connect: {
+                        id: Number(newUser.id)
+                    }
+                }
+            }
+        });
         
         // Genera el token y responde
-        const token = jwt.sign({ id: result.lastInsertRowid }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
             expiresIn: '24h'
         });
 
@@ -34,10 +48,14 @@ router.post('/register', (req, res) => {
     }
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     const {username, password} = req.body;
     try{
-        const user = getUser(username);
+        const user = await prisma.user.findUnique({
+            where: {
+                name: username
+            }
+        });
         if(!user){
             return res.status(404).json({ error: 'User not Found' });
         }
