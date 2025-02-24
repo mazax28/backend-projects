@@ -1,5 +1,5 @@
 import express from 'express'; 
-import prisma from '../prismaClient';
+import prisma from '../prismaClient.js';
 
 const router = express.Router();  
 
@@ -13,6 +13,16 @@ router.get('/', async (req, res) => {
 
 })
 
+router.get('/:id', async (req, res) => {
+    const {id} = req.params;
+    const product = await prisma.product.findUnique({
+        where:{
+            id: parseInt(id)
+        }
+    });
+    res.json(product);
+})
+
 router.post('/', async (req, res) => {
     const {name,description,image,price} = req.body;
 
@@ -22,7 +32,7 @@ router.post('/', async (req, res) => {
                 name: name,
                 description: description,
                 image: image,
-                price: price
+                price: Number(price)
             }
         }
     )
