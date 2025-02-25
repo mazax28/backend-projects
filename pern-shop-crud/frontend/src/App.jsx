@@ -1,11 +1,23 @@
-
+import { BrowserRouter,Routes,Route } from "react-router-dom"
+import HomePage from "./pages/HomePage"
+import Navbar from "./components/Navbar"
+import ProductPage from "./pages/ProductPage"
 
 function App() {
 
   return (
-    <>
-     <h1 className="text-xl font-bold">HOLA</h1>
-    </>
+    <BrowserRouter>
+    <div className="min-h-screen bg-base-200 transition-colors duration-300">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
+
+        </Routes>
+
+    </div>
+
+    </BrowserRouter>
   )
 }
 
