@@ -9,7 +9,7 @@ export default router;
 
 router.get('/', async (req, res) => {
     const products = await prisma.product.findMany();
-    res.json(products);
+    res.json({products});
 
 })
 
@@ -57,9 +57,9 @@ router.put('/:id', async (req, res) => {
     res.json(updateProduct);
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const {id} = req.params;
-    const deleteProduct = prisma.product.delete({
+    const deleteProduct = await prisma.product.delete({
         where:{
             id: parseInt(id)
         }
