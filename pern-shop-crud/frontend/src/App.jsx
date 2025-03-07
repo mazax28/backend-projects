@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar"
 import ProductPage from "./pages/ProductPage"
 import { useThemeStore } from "./store/useThemeStore"
 import {Toaster} from 'react-hot-toast'
+import Footer from "./components/Footer"
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/product/:id" element={<ProductPage />} />
 
         </Routes>
+        <Footer />
         <Toaster />
     </div>
 
