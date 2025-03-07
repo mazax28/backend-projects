@@ -3,22 +3,34 @@ const API_URL = import.meta.env.VITE_API_URL
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export const getClients = async () => {
+export const getClients = async ({ limit, page }) => {
+    console.log(`Limit: ${limit}, Page: ${page}`);
     try {
-        // Aqui se trae la data de la API
+        if (limit && page) {
+            const skip = (page - 1) * limit;
+            console.log(`Skip: ${skip}`);
+            const response = await axios.get(`${API_URL}?skip=${skip}&take=${limit}`);
+            console.log("Response:", response)
+            if (!response.data || !response.data.clients) {
+                throw new Error("Response does not contain clients' field");
+            }
+            console.log("Clients axios:", response.data.clients);
+            return response.data.clients;
+        }
+
         const response = await axios.get(`${API_URL}`);
-        
+
         if (!response.data || !response.data.clients) {
             throw new Error("Response does not contain clients' field");
         }
-        // Se devuelve solo el array de productos
-        return response.data.clients; // Axios almacena los datos en response.data
+
+        return response.data.clients;
     } catch (error) {
         toast.error("Error fetching clients");
-
         console.error("Error fetching clients:", error);
     }
 };
+
 
 
 
