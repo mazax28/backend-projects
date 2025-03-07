@@ -3,15 +3,28 @@ import {prisma} from '../PrismaClient.js';
 const router = express.Router();
 
 
+// Replace both existing router.get('/') handlers with this single one
 router.get('/', async (req, res) => {
-    try{
-        const clients = await prisma.client.findMany();
+    let skip = parseInt(req.query.skip);
+    let take = parseInt(req.query.take);
+
+    // Si no se envían, Prisma debe ignorarlos
+    skip = isNaN(skip) ? undefined : skip;
+    take = isNaN(take) ? undefined : take;
+
+    console.log("Skip:", skip, "Take:", take); // Para depurar
+
+    try {
+        const clients = await prisma.client.findMany({
+            skip,
+            take
+        });
         res.json({clients});
-    }
-    catch (error){
+    } catch (error) {
         res.status(500).json({error: 'Something went wrong'});
     }
 });
+
 
 
 router.get('/:id', async (req, res) => {
@@ -28,6 +41,7 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({error: 'Something went wrong'});
     }
 });
+
 
 
 router.post('/', async (req, res) => {
