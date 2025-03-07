@@ -8,7 +8,18 @@ export default router;
 
 
 router.get('/', async (req, res) => {
-    const products = await prisma.product.findMany();
+    let skip = parseInt(req.query.skip);
+    let take = parseInt(req.query.take);
+
+    // Si no se envían, Prisma debe ignorarlos
+    skip = isNaN(skip) ? undefined : skip;
+    take = isNaN(take) ? undefined : take;
+    const products = await prisma.product.findMany(
+        {
+            skip:skip ,
+            take:take
+        }
+    );
     res.json({products});
 
 })
