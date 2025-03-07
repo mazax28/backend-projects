@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
-import { Trash2Icon, EditIcon } from 'lucide-react'
+import { Trash2Icon, EditIcon, ShoppingCart } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { deleteProduct } from '../api/apiProducts'
+import { useCartProducts } from '../store/useCartProducts'
 function ProductCard({ product }) {
-    console.log("PRODUCTCARD",product.id)
+
+    const {addToCart} = useCartProducts()
+    const client = true
     const queryClient = useQueryClient()
     const mutation = useMutation({
         mutationFn: deleteProduct,
@@ -12,6 +15,12 @@ function ProductCard({ product }) {
           queryClient.invalidateQueries({ queryKey: ['products'] })
         },
       })
+
+    const handleAddToCart = () => {
+      console.log(product)
+      addToCart(product)
+    }
+    
 
     const handleDelete = () => {
         mutation.mutate(product.id)
@@ -27,15 +36,26 @@ function ProductCard({ product }) {
         </div>
 
         <div className="card-actions justify-end m-4">
-          <Link to={`/product/${product.id}`} className="btn btn-sm btn-info btn-outline">
-            <EditIcon className="size-4" />
-          </Link>
+          {
+            client ? (
+              <button onClick={handleAddToCart} className="btn btn-sm btn-primary btn-outline">
+                  <ShoppingCart className="size-4" />
+              </button>
+              
 
-          <button
-            className="btn btn-sm btn-error  btn-outline" onClick={handleDelete}
-          >
-            <Trash2Icon className="size-4" />
-          </button>
+            ) : (
+              <>
+                <Link to={`/product/${product.id}`} className="btn btn-sm btn-info btn-outline">
+                  <EditIcon className="size-4" />
+                </Link>
+                <button className="btn btn-sm btn-error btn-outline">
+                  <Trash2Icon className="size-4" />
+                </button>
+              
+              </>
+            )
+          }
+         
         </div>
       
     </div>
