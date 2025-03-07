@@ -3,9 +3,18 @@ const API_URL = import.meta.env.VITE_API_URL
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export const getProducts = async () => {
+export const getProducts = async ({limit, page}) => {
     try {
         // Aqui se trae la data de la API
+
+    if (page && limit) {
+        let skip = (page - 1) * limit;
+        const response = await axios.get(`${API_URL}?skip=${skip}&take=${limit}`);
+        if (!response.data || !response.data.products) {
+            throw new Error("Response does not contain 'products' field");
+        }
+        return response.data.products
+    }
         const response = await axios.get(`${API_URL}`);
         
         if (!response.data || !response.data.products) {
