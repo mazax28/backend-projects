@@ -6,7 +6,6 @@ async function generateToken(id:string){
         throw new Error('JWT_SECRET not defined')
     }
     const jwt = sign({id},JWT_SECRET,{expiresIn: '1h'});
-    console.log(jwt);
     return jwt;
 
 }
