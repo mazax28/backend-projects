@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { logMiddleware } from './middleware/Log';
 import {checkSession} from './middleware/session';
 
@@ -13,6 +14,8 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
+
 
 app.use('/items',logMiddleware,itemRouter);
 app.use('/auth',logMiddleware,authRouter);
