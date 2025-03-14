@@ -4,8 +4,12 @@ import { loginUser,registerNewUser } from "../services/authService";
 
 const loginCtrl = async (req: Request, res: Response) => {
     try{
-        const userLogin = await loginUser(req.body);
-        res.status(200).json({user: userLogin});
+        
+        const {user, token} = await loginUser(req.body);
+        res.cookie("token", token, {
+            httpOnly: true,  // Evita que JavaScript acceda a la cookie
+        });
+        res.status(200).json({user});
     }
     catch(error){
         errorHandlerHttp(res,"ERROR_LOGIN");
@@ -15,13 +19,19 @@ const loginCtrl = async (req: Request, res: Response) => {
 
 const registerCtrl = async (req: Request, res: Response) => {
     try{
-        const userRegister = await registerNewUser(req.body);
-        res.status(201).json({userRegister});
+        const {user,token} = await registerNewUser(req.body);
+        res.cookie("token", token, {
+            httpOnly: true,  // Evita que JavaScript acceda a la cookie
+        });
+        res.status(201).json({user});
 
     }
     catch(error){
         errorHandlerHttp(res,"ERROR_REGISTER");
     }
 }
-
-export { loginCtrl, registerCtrl }
+const logoutCtrl = async (req: Request, res: Response) => {
+    res.clearCookie("token");
+    res.status(200).send("Logout OK")
+}
+export { loginCtrl, registerCtrl, logoutCtrl }
