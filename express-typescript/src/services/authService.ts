@@ -19,8 +19,11 @@ async function registerNewUser(user: User) {
             password: hashedPassword
         }
     })
+
     const {password, ...userWithoutPassword} = userCreate
-    return userWithoutPassword
+    const jwt_token = await generateToken(userCreate.id.toString())
+
+    return {user: userWithoutPassword, token: jwt_token}
     
 }
 
@@ -39,7 +42,7 @@ async function loginUser(user:User) {
         throw new Error("Invalid password")
     }
     const jwt_token = await generateToken(userFound.id.toString())
-    return {...userFound, token: jwt_token}
+    return {user: userFound, token: jwt_token}
 }
 
 
