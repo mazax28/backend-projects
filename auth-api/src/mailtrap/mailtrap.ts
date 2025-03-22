@@ -1,17 +1,14 @@
-// Looking to send emails in production? Check out our Email API/SMTP product!
 import { MailtrapClient } from "mailtrap";
+const TOKEN = "756ea0ecdfe44daf6a375702a0095241";
 
-const TOKEN = process.env.TOKEN_MAILTRAP
-if (!TOKEN) {
-  console.error("Mailtrap token not found in environment variables");
-}
-
-export const client = new MailtrapClient({
+const client = new MailtrapClient({
   token: TOKEN,
-  testInboxId: 3547440,
 });
 
-export const sender = {
-  email: "hello@example.com",
+const sender = {
+  email: "hello@demomailtrap.co",
   name: "Mailtrap Test",
 };
+
+
+export {client, sender};
