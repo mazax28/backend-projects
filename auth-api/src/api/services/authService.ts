@@ -1,9 +1,8 @@
-import type { UserCreate } from "../schemas/userSchema"
+import type { UserCreate, UserLogin } from "../schemas/userSchema"
 import {userModel} from '../models/userModel'
 import { generateToken } from "../../utils/jwtHandler";
-import {hashPassword} from '../../utils/encryptionHandler'
-import { generateVerificationToken } from "../../utils/verificationTokenGenerator";
-import crypto from 'crypto'
+import {hashPassword, comparePassword} from '../../utils/encryptionHandler'
+import { generateVerificationToken } from "../../utils/verificationTokenGenerator"
 
 const registerService = async (data: UserCreate) => {
     const hashedPassword = await hashPassword(data.password);
@@ -35,6 +34,28 @@ const registerService = async (data: UserCreate) => {
 
 }
 
+const loginService = async (data: UserLogin) => {
+    const user = await userModel.findOne({
+        email: data.email
+    }).select('+password');
+    if (!user) {
+        throw new Error('User not found');
+    }
+    console.log(user);
+    const isPasswordValid = await comparePassword(data.password, user.password);
+    const token = generateToken(user._id.toString());
+    return {
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            isVerified: user.isVerified,
+        },
+        token
+    }
+
+}
 
 
-export {registerService}
+
+export {registerService,loginService}

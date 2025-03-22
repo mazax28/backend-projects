@@ -1,13 +1,15 @@
 import type {Request, Response} from 'express';
-import { createUserSchema } from '../schemas/userSchema';
+import { createUserSchema, loginUserSchema } from '../schemas/userSchema';
 import { handleError } from '../../utils/eventHandlers';
-import {registerService} from '../services/authService';
+import {registerService, loginService} from '../services/authService';
+import {sendVerificationEmail} from '../../mailtrap/email';
 
 const registerCtlr = async (req: Request, res: Response) => {
     try {
         const {body} = req;
         createUserSchema.parse(body);
         const {user, token,verificationToken} = await registerService(body);
+        await sendVerificationEmail(user.email, verificationToken);
         res.cookie('token', token, {httpOnly: true});
         res.status(201).json({user});
     }
@@ -16,3 +18,22 @@ const registerCtlr = async (req: Request, res: Response) => {
         res.status(500).send('Internal Server Error');
     }
 }
+
+
+const loginCtlr = async (req: Request, res: Response) => {
+    try {
+        const {body} = req;
+        loginUserSchema.parse(body);
+        const {user, token} = await loginService(body);
+
+        res.cookie('token', token, {httpOnly: true});
+        res.status(200).json({user});
+
+    }
+    catch (error) {
+        handleError(error as Error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+export {registerCtlr, loginCtlr}
