@@ -7,7 +7,7 @@ const userSchema = new Schema({
     lastLogin: {type: Date, required: true,default: Date.now},
     isVerified: {type: Boolean, required: true,default: false},
     resetPasswordToken: {type: String, required: false,select:false},
-    resetPasswordExpires: {type: String, required: false,select:false},
+    resetPasswordExpires: {type: Date, required: false,select:false},
     verificationToken: {type: String, required: false,select:false},
     verificationTokenExpire: {type: String, required: false,select:false},
 },{
